@@ -36,21 +36,24 @@ const News = (props)=>{
     }, [])
 
 
-    const fetchMoreData = async () => {   
-        const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apiKey}&page=${page+1}&pageSize=${props.pageSize}`;
-        setPage(page+1) 
+    const fetchMoreData = async () => {
+        const nextPage = page + 1;
+        const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apiKey}&page=${nextPage}&pageSize=${props.pageSize}`;
+        
         let data = await fetch(url);
         let parsedData = await data.json();
-        console.log(parsedData);
-        setArticles(articles.concat(parsedData.articles))
-        setTotalResults(parsedData.totalResults)
+        
+        setArticles([...articles, ...parsedData.articles]);
+        setTotalResults(parsedData.totalResults);
+        setPage(nextPage);
       };
+      
  
         return (
             <>
                 <h1 className="text-center" style={{ margin: '35px 0px', marginTop: '90px' }}>Info Beats - Top {capitalizeFirstLetter(props.category)} Headlines</h1>
                 {loading && <Spinner />}
-                <InfiniteScroll
+                {articles && <InfiniteScroll
                     dataLength={articles.length} 
                     next={fetchMoreData}
                     hasMore={articles.length !== totalResults}
@@ -65,7 +68,7 @@ const News = (props)=>{
                         })}
                     </div>
                     </div> 
-                </InfiniteScroll>
+                </InfiniteScroll>}
             </>
         )
     
